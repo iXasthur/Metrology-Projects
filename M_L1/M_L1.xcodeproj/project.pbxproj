@@ -7,14 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5140BA0D233E0C3C002F5564 /* src.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5140BA0C233E0C3C002F5564 /* src.txt */; };
 		51BA285F233BCA7000CEC8DD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BA285E233BCA7000CEC8DD /* AppDelegate.swift */; };
 		51BA2861233BCA7000CEC8DD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BA2860233BCA7000CEC8DD /* ViewController.swift */; };
 		51BA2863233BCA7100CEC8DD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 51BA2862233BCA7100CEC8DD /* Assets.xcassets */; };
 		51BA2866233BCA7100CEC8DD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 51BA2864233BCA7100CEC8DD /* Main.storyboard */; };
-		51BA286F233BCE5200CEC8DD /* src.scala in Resources */ = {isa = PBXBuildFile; fileRef = 51BA286E233BCE5200CEC8DD /* src.scala */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5140BA0C233E0C3C002F5564 /* src.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = src.txt; path = ../../M_L1_TERMINAL/M_L1_TERMINAL/src.txt; sourceTree = "<group>"; };
 		51BA285B233BCA7000CEC8DD /* M_L1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = M_L1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		51BA285E233BCA7000CEC8DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		51BA2860233BCA7000CEC8DD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -22,7 +23,6 @@
 		51BA2865233BCA7100CEC8DD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		51BA2867233BCA7100CEC8DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		51BA2868233BCA7100CEC8DD /* M_L1.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = M_L1.entitlements; sourceTree = "<group>"; };
-		51BA286E233BCE5200CEC8DD /* src.scala */ = {isa = PBXFileReference; lastKnownFileType = text; path = src.scala; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +61,7 @@
 				51BA2864233BCA7100CEC8DD /* Main.storyboard */,
 				51BA2867233BCA7100CEC8DD /* Info.plist */,
 				51BA2868233BCA7100CEC8DD /* M_L1.entitlements */,
-				51BA286E233BCE5200CEC8DD /* src.scala */,
+				5140BA0C233E0C3C002F5564 /* src.txt */,
 			);
 			path = M_L1;
 			sourceTree = "<group>";
@@ -124,8 +124,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5140BA0D233E0C3C002F5564 /* src.txt in Resources */,
 				51BA2863233BCA7100CEC8DD /* Assets.xcassets in Resources */,
-				51BA286F233BCE5200CEC8DD /* src.scala in Resources */,
 				51BA2866233BCA7100CEC8DD /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

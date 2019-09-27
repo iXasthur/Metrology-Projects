@@ -8,8 +8,22 @@
 
 import Foundation
 
-print("Hello, World!")
+func main() -> Int{
+    
+    var source: String = ""
+    
+    do {
+        source = try String(contentsOf: Bundle.main.url(forResource: "src", withExtension: "scala")!)
+        print("Succesfuly loaded source code!")
+    } catch let err {
+        fatalError(err.localizedDescription)
+    }
+    
+    
+    return 0
+}
 
-
+let result = main()
+print("Main func return code:", result)
 
 

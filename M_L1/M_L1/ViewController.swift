@@ -16,7 +16,7 @@ class ViewController: NSViewController {
         var source: String = ""
         
         do {
-            source = try String(contentsOf: Bundle.main.url(forResource: "src", withExtension: "scala")!)
+            source = try String(contentsOf: Bundle.main.url(forResource: "src", withExtension: "txt")!)
         } catch let err {
             fatalError(err.localizedDescription)
         }

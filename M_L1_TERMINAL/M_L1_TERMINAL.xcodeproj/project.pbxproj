@@ -8,24 +8,26 @@
 
 /* Begin PBXBuildFile section */
 		51674B60233E01D000E74019 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51674B5F233E01D000E74019 /* main.swift */; };
+		51B9C198233E0E8600B27ED6 /* src.scala in CopyFiles */ = {isa = PBXBuildFile; fileRef = 51D3C317233E03F200F24585 /* src.scala */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		51674B5A233E01D000E74019 /* CopyFiles */ = {
+		51B9C197233E0E6700B27ED6 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			dstPath = "";
+			dstSubfolderSpec = 7;
 			files = (
+				51B9C198233E0E8600B27ED6 /* src.scala in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		51674B5C233E01D000E74019 /* M_L1_TERMINAL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = M_L1_TERMINAL; sourceTree = BUILT_PRODUCTS_DIR; };
 		51674B5F233E01D000E74019 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		51674B66233E023200E74019 /* src.scala */ = {isa = PBXFileReference; lastKnownFileType = text; name = src.scala; path = ../../M_L1/M_L1/src.scala; sourceTree = "<group>"; };
+		51D3C317233E03F200F24585 /* src.scala */ = {isa = PBXFileReference; lastKnownFileType = text; path = src.scala; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,7 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				51674B5F233E01D000E74019 /* main.swift */,
-				51674B66233E023200E74019 /* src.scala */,
+				51D3C317233E03F200F24585 /* src.scala */,
 			);
 			path = M_L1_TERMINAL;
 			sourceTree = "<group>";
@@ -73,7 +75,8 @@
 			buildPhases = (
 				51674B58233E01D000E74019 /* Sources */,
 				51674B59233E01D000E74019 /* Frameworks */,
-				51674B5A233E01D000E74019 /* CopyFiles */,
+				51D3C318233E063000F24585 /* Resources */,
+				51B9C197233E0E6700B27ED6 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -115,6 +118,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		51D3C318233E063000F24585 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		51674B58233E01D000E74019 /* Sources */ = {
