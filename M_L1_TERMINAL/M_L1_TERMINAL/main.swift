@@ -17,13 +17,15 @@ struct MetricsElement {
 
 struct CodeBlock {
     var code: String = ""
+    var internalBlocks: [String:CodeBlock] = [:]
     var operands: [String:Int] = [:]
     var operators: [String:Int] = [:]
 }
 
 class CodeAnalyzer {
     private var code: String! = ""
-    private var metrics: [String:CodeBlock]! = [:]
+//    private var metrics: [String:CodeBlock]! = [:]
+    private var metrics: CodeBlock! = CodeBlock(code: "", internalBlocks: [:], operands: [:], operators: [:])
     
     private let commentPattern = #"(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*)"#
     private let functionPattern = #"((def)[^{}]*(\{))([^{}]*)(\})"#
@@ -35,39 +37,39 @@ class CodeAnalyzer {
     
     init(s: String) {
         code = s
-        removeComments()
-        removeBlankLines()
-//        removeUnnededSpaces()
+        removeComments(s: &code)
+        removeBlankLines(s: &code)
+//        removeUnnededSpaces(s: code)
     }
     
-    private func removeComments(){
-        code = code.replacingOccurrences(of: commentPattern, with: "", options: .regularExpression, range: nil)
+    private func removeComments(s: inout String){
+        s = s.replacingOccurrences(of: commentPattern, with: "", options: .regularExpression, range: nil)
     }
     
-    private func removeBlankLines(){
-        var buffCode: String = code.replacingOccurrences(of: blankLinePattern, with: "\n", options: .regularExpression, range: nil)
+    private func removeBlankLines(s: inout String){
+        var buffCode: String = s.replacingOccurrences(of: blankLinePattern, with: "\n", options: .regularExpression, range: nil)
         
-        while buffCode != code {
-            code = buffCode
-            buffCode = code.replacingOccurrences(of: blankLinePattern, with: "\n", options: .regularExpression, range: nil)
+        while buffCode != s {
+            s = buffCode
+            buffCode = s.replacingOccurrences(of: blankLinePattern, with: "\n", options: .regularExpression, range: nil)
         }
     }
     
-    private func removeUnnededSpaces(){
-        var buffCode: String = code.replacingOccurrences(of: unneededSpecesPattern, with: "", options: .regularExpression, range: nil)
+    private func removeUnnededSpaces(s: inout String){
+        var buffCode: String = s.replacingOccurrences(of: unneededSpecesPattern, with: "", options: .regularExpression, range: nil)
         
-        while buffCode != code {
-            code = buffCode
-            buffCode = code.replacingOccurrences(of: unneededSpecesPattern, with: "", options: .regularExpression, range: nil)
+        while buffCode != s {
+            s = buffCode
+            buffCode = s.replacingOccurrences(of: unneededSpecesPattern, with: "", options: .regularExpression, range: nil)
         }
     }
     
     private func findBlock(in str: String,startingWith s: String) -> [String:Range<String.Index>]{
         guard let r: Range<String.Index> = str.range(of: s) else {
-            print(("-> No block found starting with \"\(s)\"!"))
+//            print(("-> No block found starting with \"\(s)\"!"))
             return [:]
         }
-        print("Found block starting with \"\(s)\"!")
+//        print("Found block starting with \"\(s)\"!")
         
         let blockStartIndex: String.Index = r.lowerBound
         var bracketsToSkip: Int = -1
@@ -96,42 +98,94 @@ class CodeAnalyzer {
         return [name:blockRange]
     }
     
+    private func updateInternalBlocksRecursion(block: inout [String:CodeBlock]){
+        block.forEach { (arg0) in
+            let (key, value) = arg0
+            var buffCode:String = value.code
+            buffCode.removeFirst(functionBlockName.count)
+            
+            var b:[String:Range<String.Index>] = findBlock(in: buffCode, startingWith: functionBlockName)
+            while b != [:] {
+                let k: String = b.first!.key
+                let v: Range<String.Index> = b.first!.value
+                let cBlock: CodeBlock = CodeBlock(code: String(buffCode[v]), internalBlocks: [:], operands: [:], operators: [:])
+                block[key]!.internalBlocks.updateValue(cBlock, forKey: k)
+                buffCode.removeSubrange(v)
+                b = findBlock(in: buffCode, startingWith: functionBlockName)
+            }
+            
+            removeBlankLines(s: &buffCode)
+            block[key]!.code = functionBlockName + buffCode
+            
+            
+            if block[key]!.internalBlocks.count != 0 {
+                updateInternalBlocksRecursion(block: &block[key]!.internalBlocks)
+            }
+        }
+    }
+    
+    private func updateInternalBlocks(){
+        let keys = metrics.internalBlocks.keys
+        keys.forEach { (key) in
+            var buffCode: String = metrics.internalBlocks[key]!.code
+            buffCode.removeFirst(functionBlockName.count)
+            var b:[String:Range<String.Index>] = findBlock(in: buffCode, startingWith: functionBlockName)
+            
+            while b != [:] {
+                let k: String = b.first!.key
+                let v: Range<String.Index> = b.first!.value
+                let cBlock: CodeBlock = CodeBlock(code: String(buffCode[v]), internalBlocks: [:], operands: [:], operators: [:])
+                metrics.internalBlocks[key]!.internalBlocks.updateValue(cBlock, forKey: k)
+                buffCode.removeSubrange(v)
+                b = findBlock(in: buffCode, startingWith: functionBlockName)
+            }
+            
+            removeBlankLines(s: &buffCode)
+            metrics.internalBlocks[key]!.code = functionBlockName + buffCode
+        }
+    }
+    
     func updateMetrics(){
         var buffCode: String = code
         var b:[String:Range<String.Index>] = findBlock(in: buffCode, startingWith: objectBlockName)
         if b != [:] {
-            let k: String = b.first!.key
             let v: Range<String.Index> = b.first!.value
-            metrics.updateValue(CodeBlock(code: String(buffCode[v]), operands: [:], operators: [:]), forKey: k)
+            buffCode = String(buffCode[v])
+            metrics.code = buffCode
         }
         
         b = findBlock(in: buffCode, startingWith: functionBlockName)
         while b != [:] {
             let k: String = b.first!.key
             let v: Range<String.Index> = b.first!.value
-            metrics.updateValue(CodeBlock(code: String(buffCode[v]), operands: [:], operators: [:]), forKey: k)
+            let cBlock: CodeBlock = CodeBlock(code: String(buffCode[v]), internalBlocks: [:], operands: [:], operators: [:])
+            metrics.internalBlocks.updateValue(cBlock, forKey: k)
             buffCode.removeSubrange(v)
             b = findBlock(in: buffCode, startingWith: functionBlockName)
         }
         
-        
+//        updateInternalBlocks()
+        updateInternalBlocksRecursion(block: &metrics.internalBlocks)
+    }
+    
+    private func outputMetricsRecursion(block: inout [String:CodeBlock]){
+        block.forEach { (arg0) in
+            let (key, value) = arg0
+            print("Block: \(key)")
+            print("Code: \(value.code)")
+            print("Operands: \(value.operands)")
+            print("Operators: \(value.operators)")
+            print()
+            
+            if value.internalBlocks.count != 0 {
+                outputMetricsRecursion(block: &block[key]!.internalBlocks)
+            }
+        }
     }
     
     func outputMetrics(){
         print("Metrics:")
-        print()
-        
-        metrics.forEach { (arg0) in
-            let (key, value) = arg0
-            if key.range(of: objectBlockName) == nil {
-                print("Block: \(key)")
-                print("Code: \(value.code)")
-                print()
-            } else {
-                print("Skipped object block")
-                print()
-            }
-        }
+        outputMetricsRecursion(block: &metrics.internalBlocks)
     }
     
     func outputCode(){
