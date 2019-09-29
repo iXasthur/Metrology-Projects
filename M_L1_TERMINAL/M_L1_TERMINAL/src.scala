@@ -1,6 +1,6 @@
 package examples
 
-/** Quick sort, imperative style */
+/** Quick sort, impe*rat/ive style */
 
 object sort {
 
@@ -10,7 +10,7 @@ object sort {
     */
 
     def sort(a: Array[Int]) {
-
+        /*ANIME-STAR*/
         def swap(i: Int, j: Int) {
             val t = a(i); a(i) = a(j); a(j) = t
         }
