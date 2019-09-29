@@ -39,7 +39,34 @@ class CodeAnalyzer {
         code = s
         removeComments(s: &code)
         removeBlankLines(s: &code)
-//        removeUnnededSpaces(s: code)
+//        removeUnneededSpaces(s: &code)
+        
+        if !checkCodeForParentheses(s: code) {
+            code = ""
+            print("-> There are some errors in the source code. Resetting code to blank string")
+        }
+    }
+    
+    private func checkCodeForParentheses(s: String) -> Bool {
+        var a: Int = 0
+        var i: String.Index = s.startIndex
+        while i<s.endIndex {
+            switch s[i]{
+            case "{":
+                a = a + 1;
+            case "}":
+                a = a - 1;
+            default:
+                break
+            }
+            i = s.index(i, offsetBy: 1)
+        }
+        
+        if a == 0 {
+            return true
+        } else {
+            return false
+        }
     }
     
     private func removeComments(s: inout String){
@@ -55,7 +82,7 @@ class CodeAnalyzer {
         }
     }
     
-    private func removeUnnededSpaces(s: inout String){
+    private func removeUnneededSpaces(s: inout String){
         var buffCode: String = s.replacingOccurrences(of: unneededSpecesPattern, with: "", options: .regularExpression, range: nil)
         
         while buffCode != s {
@@ -115,6 +142,7 @@ class CodeAnalyzer {
             }
             
             removeBlankLines(s: &buffCode)
+//            removeUnneededSpaces(s: &buffCode)
             block[key]!.code = functionBlockName + buffCode
             
             
@@ -172,7 +200,8 @@ class CodeAnalyzer {
         block.forEach { (arg0) in
             let (key, value) = arg0
             print("Block: \(key)")
-            print("Code: \(value.code)")
+            print("Code:")
+            print("\(value.code)")
             print("Operands: \(value.operands)")
             print("Operators: \(value.operators)")
             print()
