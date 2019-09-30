@@ -57,7 +57,6 @@ object sort {
     // Entry point
     def main(args: Array[String]) {
         val ar = Array(6, 2, 8, 5, 1)
-        (555 + ((qwe((pi+3)),qwe(qwe((pi+3)))) + ((anime(anime(anime(anime(anime((pi+3)),anime()))),anime()))))) // 3+7
         println(ar)
         sort(ar)
         println(ar)
