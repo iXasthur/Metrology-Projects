@@ -60,6 +60,8 @@ object sort {
         println(ar)
         sort(ar)
         println(ar)
+
+        anime(star)
     }
 
 }

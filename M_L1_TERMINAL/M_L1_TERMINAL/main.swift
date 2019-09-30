@@ -55,24 +55,24 @@ class CodeAnalyzer {
     }
     
     private func checkCodeForParentheses(s: String) -> Bool {
-        let parenthesses: [[Character]] = [["{","}"],["(",")"],["[","]"]]
-        var a: [Int] = Array(repeating: 0, count: parenthesses.count)
+        let parentheses: [[Character]] = [["{","}"],["(",")"],["[","]"]]
+        var a: [Int] = Array(repeating: 0, count: parentheses.count)
         var i: String.Index = s.startIndex
         var ret: Bool = true
         
         while i<s.endIndex {
             switch s[i]{
-            case parenthesses[0][0]:
+            case parentheses[0][0]:
                 a[0] = a[0] + 1;
-            case parenthesses[0][1]:
+            case parentheses[0][1]:
                 a[0] = a[0] - 1;
-            case parenthesses[1][0]:
+            case parentheses[1][0]:
                 a[1] = a[1] + 1;
-            case parenthesses[1][1]:
+            case parentheses[1][1]:
                 a[1] = a[1] - 1;
-            case parenthesses[2][0]:
+            case parentheses[2][0]:
                 a[2] = a[2] + 1;
-            case parenthesses[2][1]:
+            case parentheses[2][1]:
                 a[2] = a[2] - 1;
             default:
                 break
