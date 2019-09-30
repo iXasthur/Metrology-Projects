@@ -47,7 +47,7 @@ object sort {
 
     def println(ar: Array[Int]) {
         def print1 = {
-            iter = ar(i) + (if (i < ar.length()-1) "," + iter(i+1) else "")
+            iter() = ar(i) + (if (i < ar.length()-1) "," + iter(i+1) else "")
             if (ar.length() == 0) "" else iter(0)
         }
 

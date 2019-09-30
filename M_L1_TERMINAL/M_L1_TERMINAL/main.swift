@@ -223,6 +223,7 @@ class CodeAnalyzer {
             var buffCode:String = value.code
             buffCode.removeFirst(key.count)
             
+            // Finds simple operators
             simpleOperators.forEach({ (op) in
                 var count: Int = 0
                 var pos: Range<String.Index>? = buffCode.range(of: op)
@@ -237,6 +238,7 @@ class CodeAnalyzer {
                 }
             })
             
+            // Finds complex operators
             var r:Range<String.Index>? = buffCode.range(of: complexOperatorPattern, options: .regularExpression, range: nil, locale: nil)
             while r != nil {
                 var op: String = String(buffCode[r!])
@@ -256,10 +258,6 @@ class CodeAnalyzer {
                 r = buffCode.range(of: complexOperatorPattern, options: .regularExpression, range: nil, locale: nil)
             }
             
-//            print(buffCode)
-//            removeBlankLines(s: &buffCode)
-//            block[key]!.code = buffCode
-            
             if block[key]!.internalBlocks.count != 0 {
                 updateOperatorsRecursion(block: &block[key]!.internalBlocks)
             }
@@ -272,31 +270,36 @@ class CodeAnalyzer {
             var buffCode:String = value0.code
             buffCode.removeFirst(key0.count)
             
+            // Removes simple operators
+            simpleOperators.forEach({ (s) in
+                buffCode = buffCode.replacingOccurrences(of: s, with: " ")
+            })
+            
+            // Finds string operands
+            var rng: Range<String.Index>? = buffCode.range(of: stringPattern, options: .regularExpression, range: nil, locale: nil)
+            while rng != nil {
+                let constStr: String = String(buffCode[rng!])
+                if block[key0]!.operands[constStr] == nil {
+                    block[key0]!.operands.updateValue(1, forKey: constStr)
+                } else {
+                    let lastVal: Int? = block[key0]!.operands[constStr]
+                    block[key0]!.operands.updateValue(lastVal! + 1, forKey: constStr)
+                }
+                buffCode.removeSubrange(rng!)
+                rng = buffCode.range(of: stringPattern, options: .regularExpression, range: nil, locale: nil)
+            }
+            
+            // Removes complex operators
             value0.operators.forEach({ (arg1) in
                 let (key1, _) = arg1
-                simpleOperators.forEach({ (s) in
-                    buffCode = buffCode.replacingOccurrences(of: s, with: " ")
-                })
-                
-                var rng: Range<String.Index>? = buffCode.range(of: stringPattern, options: .regularExpression, range: nil, locale: nil)
-                while rng != nil {
-                    let constStr: String = String(buffCode[rng!])
-                    if block[key0]!.operands[constStr] == nil {
-                        block[key0]!.operands.updateValue(1, forKey: constStr)
-                    } else {
-                        let lastVal: Int? = block[key0]!.operands[constStr]
-                        block[key0]!.operands.updateValue(lastVal! + 1, forKey: constStr)
-                    }
-                    buffCode.removeSubrange(rng!)
-                    rng = buffCode.range(of: stringPattern, options: .regularExpression, range: nil, locale: nil)
-                }
                 
                 var pos: String.Index? = key1.firstIndex(of: "(")
                 if pos != nil {
-                    var strToReplace: String = key1
+                    var strToReplace: String = ""
                     pos = key1.index(pos!, offsetBy: -1)
-                    strToReplace = String(strToReplace[strToReplace.startIndex...pos!])
+                    strToReplace = String(key1[key1.startIndex...pos!])
                     strToReplace = #"[^\w]"# + strToReplace + #"[^\w]"#
+                    
                     var r = buffCode.range(of: strToReplace, options: .regularExpression, range: nil, locale: nil)
                     while r != nil {
                         let leftBound = buffCode.index(r!.lowerBound, offsetBy: 1)
@@ -305,15 +308,12 @@ class CodeAnalyzer {
                         r = buffCode.range(of: strToReplace, options: .regularExpression, range: nil, locale: nil)
                     }
                 }
-                
-                buffCode = buffCode.replacingOccurrences(of: "(", with: " ")
-                buffCode = buffCode.replacingOccurrences(of: ")", with: " ")
-                buffCode = buffCode.replacingOccurrences(of: ",", with: " ")
-                buffCode = buffCode.replacingOccurrences(of: ".", with: " ")
-                buffCode = buffCode.replacingOccurrences(of: "{", with: " ")
-                buffCode = buffCode.replacingOccurrences(of: "}", with: " ")
-                buffCode = buffCode.replacingOccurrences(of: "val", with: " ")
-                buffCode = buffCode.replacingOccurrences(of: "var", with: " ")
+            })
+            
+            // Clears string
+            let symbolsToRemove: [String] = ["(",")",",",".","{","}","val","var"]
+            symbolsToRemove.forEach({ (sym) in
+                buffCode = buffCode.replacingOccurrences(of: sym, with: " ")
             })
             
             var saveCode: String = ""
@@ -323,6 +323,7 @@ class CodeAnalyzer {
                 buffCode = buffCode.replacingOccurrences(of: "  ", with: " ")
             }
             
+            // Finds operands
             var buffStr: String = ""
             var i: String.Index = buffCode.startIndex
             while (i<buffCode.endIndex) && buffCode[i] == " " {
@@ -330,7 +331,6 @@ class CodeAnalyzer {
             }
             while i<buffCode.endIndex {
                 if buffCode[i] == " " {
-//                    print("Operand: \(buffStr)")
                     if block[key0]?.operands[buffStr] == nil {
                         block[key0]!.operands.updateValue(1, forKey: buffStr)
                     } else {
