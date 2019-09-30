@@ -57,7 +57,7 @@ object sort {
     // Entry point
     def main(args: Array[String]) {
         val ar = Array(6, 2, 8, 5, 1)
-
+        anime(anime(anime(anime(anime(),anime()))),anime()) //7
         println(ar)
         sort(ar)
         println(ar)

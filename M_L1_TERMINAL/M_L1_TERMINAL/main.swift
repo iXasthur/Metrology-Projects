@@ -31,9 +31,17 @@ class CodeAnalyzer {
     private let functionPattern = #"((def)[^{}]*(\{))([^{}]*)(\})"#
     private let blankLinePattern = #"[\r\n] *[\r\n]"#
     private let unneededSpecesPattern = #" {2,}"#
+    private let complexOperatorPattern = #"(\w+ {0,1})(\(.*\))"#
+    private let closedComplexOperatorPattern = #"(\w+ {0,1})(\([^()]*\))"#
+//    private let bracketsPattern = #"(\(.*\))"#
+    private let closedBracketsPattern = #"(\([^()]*\))"#
     
     private let objectBlockName = "object"
     private let functionBlockName = "def"
+    
+    private let simpleOperators: [String] = ["<<=",">>=","<<<",">>>","<<",">>","&&","||","==","!=","^=","|=","&=","%=","/=","*=","+=","-=",">=","<=","~","&","|","^","!","=",">","<","+","-","*","/","%",";"]
+    private let complexOperators: [String] = []
+    
     
     init(s: String) {
         code = s
@@ -152,28 +160,7 @@ class CodeAnalyzer {
         }
     }
     
-    private func updateInternalBlocks(){
-        let keys = metrics.internalBlocks.keys
-        keys.forEach { (key) in
-            var buffCode: String = metrics.internalBlocks[key]!.code
-            buffCode.removeFirst(functionBlockName.count)
-            var b:[String:Range<String.Index>] = findBlock(in: buffCode, startingWith: functionBlockName)
-            
-            while b != [:] {
-                let k: String = b.first!.key
-                let v: Range<String.Index> = b.first!.value
-                let cBlock: CodeBlock = CodeBlock(code: String(buffCode[v]), internalBlocks: [:], operands: [:], operators: [:])
-                metrics.internalBlocks[key]!.internalBlocks.updateValue(cBlock, forKey: k)
-                buffCode.removeSubrange(v)
-                b = findBlock(in: buffCode, startingWith: functionBlockName)
-            }
-            
-            removeBlankLines(s: &buffCode)
-            metrics.internalBlocks[key]!.code = functionBlockName + buffCode
-        }
-    }
-    
-    func updateMetrics(){
+    private func updateObjectBlock(){
         var buffCode: String = code
         var b:[String:Range<String.Index>] = findBlock(in: buffCode, startingWith: objectBlockName)
         if b != [:] {
@@ -191,9 +178,87 @@ class CodeAnalyzer {
             buffCode.removeSubrange(v)
             b = findBlock(in: buffCode, startingWith: functionBlockName)
         }
-        
-//        updateInternalBlocks()
-        updateInternalBlocksRecursion(block: &metrics.internalBlocks)
+    }
+    
+    private func clearComplexOperator(s: String) -> String {
+        var newStr: String = "ERROR"
+        let r: String.Index? = s.firstIndex(of: "(")
+        if r != nil {
+            newStr = String(s[s.startIndex...r!])
+            newStr = newStr + "...)"
+        }
+        return newStr.replacingOccurrences(of: " ", with: "")
+    }
+    
+    private func findComplexOperators(s: inout String, arr: inout [String]){
+        var r: Range<String.Index>? = s.range(of: closedComplexOperatorPattern, options: .regularExpression, range: nil, locale: nil)
+        while r != nil {
+            arr.append(clearComplexOperator(s: String(s[r!])))
+            s.removeSubrange(r!)
+            r = s.range(of: closedComplexOperatorPattern, options: .regularExpression, range: nil, locale: nil)
+        }
+        r = s.range(of: closedBracketsPattern, options: .regularExpression, range: nil, locale: nil)
+        if r != nil {
+            s.removeSubrange(r!)
+            findComplexOperators(s: &s, arr: &arr)
+        }
+    }
+    
+    private func updateOperatorsRecursion(block: inout [String:CodeBlock]){
+        block.forEach { (arg0) in
+            let (key, value) = arg0
+            var buffCode:String = value.code
+            buffCode.removeFirst(key.count)
+            
+            simpleOperators.forEach({ (op) in
+                var count: Int = 0
+                var pos: Range<String.Index>? = buffCode.range(of: op)
+                while pos != nil {
+                    count = count + 1
+                    buffCode.removeSubrange(pos!)
+                    pos = buffCode.range(of: op)
+                }
+                
+                if count > 0 {
+                    block[key]?.operators.updateValue(count, forKey: op)
+                }
+            })
+            
+            var r:Range<String.Index>? = buffCode.range(of: complexOperatorPattern, options: .regularExpression, range: nil, locale: nil)
+            while r != nil {
+                var op: String = String(buffCode[r!])
+                var opArray: [String] = []
+                
+                findComplexOperators(s: &op, arr: &opArray)
+                
+                opArray.forEach({ (s) in
+                    if block[key]!.operators[s] == nil {
+                        block[key]!.operators.updateValue(1, forKey: s)
+                    } else {
+                        let prevValue = block[key]!.operators[s]
+                        block[key]!.operators.updateValue(prevValue! + 1, forKey: s)
+                    }
+                })
+                buffCode.removeSubrange(r!)
+                r = buffCode.range(of: complexOperatorPattern, options: .regularExpression, range: nil, locale: nil)
+            }
+            
+//            print(buffCode)
+            removeBlankLines(s: &buffCode)
+//            block[key]!.code = buffCode
+            
+            if block[key]!.internalBlocks.count != 0 {
+                updateOperatorsRecursion(block: &block[key]!.internalBlocks)
+            }
+        }
+    }
+    
+    func updateMetrics(){
+        if code != "" {
+            updateObjectBlock()
+            updateInternalBlocksRecursion(block: &metrics.internalBlocks)
+            updateOperatorsRecursion(block: &metrics.internalBlocks)
+        }
     }
     
     private func outputMetricsRecursion(block: inout [String:CodeBlock]){
