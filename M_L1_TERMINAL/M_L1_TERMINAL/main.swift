@@ -24,7 +24,6 @@ struct CodeBlock {
 
 class CodeAnalyzer {
     private var code: String! = ""
-//    private var metrics: [String:CodeBlock]! = [:]
     private var metrics: CodeBlock! = CodeBlock(code: "", internalBlocks: [:], operands: [:], operators: [:])
     
     private let commentPattern = #"(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*)"#
@@ -47,7 +46,7 @@ class CodeAnalyzer {
         code = s
         removeComments(s: &code)
         removeBlankLines(s: &code)
-//        removeUnneededSpaces(s: &code)
+        removeUnneededSpaces(s: &code)
         
         if !checkCodeForParentheses(s: code) {
             code = ""
