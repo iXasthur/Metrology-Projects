@@ -40,7 +40,6 @@ class CodeAnalyzer {
     private let functionBlockName = "def"
     
     private let simpleOperators: [String] = ["<<=",">>=","<<<",">>>","<<",">>","&&","||","==","!=","^=","|=","&=","%=","/=","*=","+=","-=",">=","<=","~","&","|","^","!","=",">","<","+","-","*","/","%",";"]
-    private let complexOperators: [String] = []
     
     
     init(s: String) {
@@ -56,25 +55,38 @@ class CodeAnalyzer {
     }
     
     private func checkCodeForParentheses(s: String) -> Bool {
-        var a: Int = 0
+        let parenthesses: [[Character]] = [["{","}"],["(",")"],["[","]"]]
+        var a: [Int] = Array(repeating: 0, count: parenthesses.count)
         var i: String.Index = s.startIndex
+        var ret: Bool = true
+        
         while i<s.endIndex {
             switch s[i]{
-            case "{":
-                a = a + 1;
-            case "}":
-                a = a - 1;
+            case parenthesses[0][0]:
+                a[0] = a[0] + 1;
+            case parenthesses[0][1]:
+                a[0] = a[0] - 1;
+            case parenthesses[1][0]:
+                a[1] = a[1] + 1;
+            case parenthesses[1][1]:
+                a[1] = a[1] - 1;
+            case parenthesses[2][0]:
+                a[2] = a[2] + 1;
+            case parenthesses[2][1]:
+                a[2] = a[2] - 1;
             default:
                 break
             }
             i = s.index(i, offsetBy: 1)
         }
         
-        if a == 0 {
-            return true
-        } else {
-            return false
+        a.forEach { (z) in
+            if z != 0 {
+                ret = false
+            }
         }
+        
+        return ret
     }
     
     private func removeComments(s: inout String){
