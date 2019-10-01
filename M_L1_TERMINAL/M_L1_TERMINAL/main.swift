@@ -10,11 +10,6 @@ import Foundation
 
 // 6 + 3 Scala
 
-struct MetricsElement {
-    var name: String = ""
-    var count: Int = 0
-}
-
 struct CodeBlock {
     var code: String = ""
     var internalBlocks: [String:CodeBlock] = [:]
@@ -22,9 +17,23 @@ struct CodeBlock {
     var operators: [String:Int] = [:]
 }
 
+struct Metrics {
+    var n1: Int = 0
+    var n2: Int = 0
+    
+    var N1: Int = 0
+    var N2: Int = 0
+    
+    var n: Int = 0
+    var N: Int = 0
+    var V: Double = 0
+}
+
 class CodeAnalyzer {
     private var code: String! = ""
-    private var metrics: CodeBlock! = CodeBlock(code: "", internalBlocks: [:], operands: [:], operators: [:])
+    private var mainBlocks: CodeBlock! = CodeBlock(code: "", internalBlocks: [:], operands: [:], operators: [:])
+    
+    private var metrics: Metrics! = Metrics()
     
     private let commentPattern = #"(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*)"#
     private let functionPattern = #"((def)[^{}]*(\{))([^{}]*)(\})"#
@@ -46,7 +55,7 @@ class CodeAnalyzer {
         code = s
         removeComments(s: &code)
         removeBlankLines(s: &code)
-        removeUnneededSpaces(s: &code)
+//        removeUnneededSpaces(s: &code)
         
         if !checkCodeForParentheses(s: code) {
             code = ""
@@ -178,15 +187,16 @@ class CodeAnalyzer {
         if b != [:] {
             let v: Range<String.Index> = b.first!.value
             buffCode = String(buffCode[v])
-            metrics.code = buffCode
+            mainBlocks.code = buffCode
         }
         
         b = findBlock(in: buffCode, startingWith: functionBlockName)
         while b != [:] {
             let k: String = b.first!.key
+            mainBlocks.operands.updateValue(1, forKey: k)
             let v: Range<String.Index> = b.first!.value
             let cBlock: CodeBlock = CodeBlock(code: String(buffCode[v]), internalBlocks: [:], operands: [:], operators: [:])
-            metrics.internalBlocks.updateValue(cBlock, forKey: k)
+            mainBlocks.internalBlocks.updateValue(cBlock, forKey: k)
             buffCode.removeSubrange(v)
             b = findBlock(in: buffCode, startingWith: functionBlockName)
         }
@@ -310,7 +320,7 @@ class CodeAnalyzer {
             })
             
             // Clears string
-            let symbolsToRemove: [String] = ["(",")",",",".","{","}","val","var"]
+            let symbolsToRemove: [String] = ["(",")",",",".","{","}","val","var","else"]
             symbolsToRemove.forEach({ (sym) in
                 buffCode = buffCode.replacingOccurrences(of: sym, with: " ")
             })
@@ -351,12 +361,42 @@ class CodeAnalyzer {
         }
     }
     
+    private func countMetrics(block: inout [String:CodeBlock]){
+        block.forEach { (arg0) in
+            let (key, value) = arg0
+            
+            value.operands.forEach({ (arg1) in
+                let (_, value1) = arg1
+                metrics.N2 = metrics.N2 + value1
+            })
+            metrics.n2 = metrics.n2 + value.operands.count
+            
+            value.operators.forEach({ (arg1) in
+                let (_, value1) = arg1
+                metrics.N1 = metrics.N1 + value1
+            })
+            metrics.n1 = metrics.n1 + value.operators.count
+            
+            if block[key]!.internalBlocks.count != 0 {
+                countMetrics(block: &block[key]!.internalBlocks)
+            }
+        }
+    }
+    
+    private func updateMetricsValues(){
+        countMetrics(block: &mainBlocks.internalBlocks)
+        metrics.n = metrics.n1 + metrics.n2
+        metrics.N = metrics.N1 + metrics.N2
+        metrics.V = Double(metrics.N)*log2(Double(metrics.n))
+    }
+    
     func updateMetrics(){
         if code != "" {
             updateObjectBlock()
-            updateInternalBlocksRecursion(block: &metrics.internalBlocks)
-            updateOperatorsRecursion(block: &metrics.internalBlocks)
-            updateOperandsRecursion(block: &metrics.internalBlocks)
+            updateInternalBlocksRecursion(block: &mainBlocks.internalBlocks)
+            updateOperatorsRecursion(block: &mainBlocks.internalBlocks)
+            updateOperandsRecursion(block: &mainBlocks.internalBlocks)
+            updateMetricsValues()
         }
     }
     
@@ -378,7 +418,8 @@ class CodeAnalyzer {
     
     func outputMetrics(){
         print("Metrics:")
-        outputMetricsRecursion(block: &metrics.internalBlocks)
+        outputMetricsRecursion(block: &mainBlocks.internalBlocks)
+        print(metrics!)
     }
     
     func outputCode(){
