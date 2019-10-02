@@ -260,34 +260,35 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
                         check = false
                     }
                 }
-                if check && metricsNames.contains(ident!) && !blockedStrings.contains(ident!) {
+                if check && metricsNames.contains(ident!) {
                     blockNames.forEach { (s) in
                         if item.hasPrefix(s){
                             text = String(analyzer.getMetricsOfBlock(name: s, t: ident!))
                         }
                     }
-                } else {
-                    var itemStr = item
-                    let lastIndex: String.Index = item.index(before: item.endIndex)
-                    var value: Int? = nil
-                    
-                    var r: Range<String.Index>? = item.range(of: "_"+operatorsFieldName)
-                    if r != nil {
-                        let firstIndex: String.Index = r!.lowerBound
-                        itemStr.removeSubrange(firstIndex...lastIndex)
-                        value = operatorsDictiotary[itemStr]?[ident!]
-                    } else {
-                        r = item.range(of: "_"+operandsFieldName)
+                } else
+                    if !check {
+                        var itemStr = item
+                        let lastIndex: String.Index = item.index(before: item.endIndex)
+                        var value: Int? = nil
+                        
+                        var r: Range<String.Index>? = item.range(of: "_"+operatorsFieldName)
                         if r != nil {
                             let firstIndex: String.Index = r!.lowerBound
                             itemStr.removeSubrange(firstIndex...lastIndex)
-                            value = operandsDictiotary[itemStr]?[ident!]
+                            value = operatorsDictiotary[itemStr]?[ident!]
+                        } else {
+                            r = item.range(of: "_"+operandsFieldName)
+                            if r != nil {
+                                let firstIndex: String.Index = r!.lowerBound
+                                itemStr.removeSubrange(firstIndex...lastIndex)
+                                value = operandsDictiotary[itemStr]?[ident!]
+                            }
                         }
-                    }
-                    
-                    if value != nil {
-                        text = String(value!)
-                    }
+                        
+                        if value != nil {
+                            text = String(value!)
+                        }
                 }
             }
         default:
