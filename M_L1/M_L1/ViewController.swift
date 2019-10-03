@@ -11,8 +11,8 @@ import Cocoa
 class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource {
     @IBOutlet weak var outlineView: NSOutlineView!
     var blockNames: [String] = ["Overall"]
-    let operandsFieldName:String = "Operands"
-    let operatorsFieldName:String = "Operators"
+    let operandsFieldName:String = "Operands(f2)"
+    let operatorsFieldName:String = "Operators(f1)"
     var metricsNames: [String] = ["n1","n2","N1","N2","n","N","V"]
     var operatorsDictiotary: [String:[String:Int]] = [:]
     var operatorsDictionarySortedKeysDictionary: [String:[String]] = [:]
@@ -34,8 +34,8 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
     }
     
     override func viewDidLoad() {
-        metricsNames.append(operandsFieldName)
         metricsNames.append(operatorsFieldName)
+        metricsNames.append(operandsFieldName)
         super.viewDidLoad()
         
         var source: String = ""
@@ -115,7 +115,11 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
         } else {
             if itemStr != nil {
                 if blockNames.contains(itemStr!) {
-                    return String(itemStr! + "_" + metricsNames[index])
+                    if itemStr == "Overall" && (metricsNames[index] == operandsFieldName || metricsNames[index] == operatorsFieldName) {
+                        return 0
+                    } else {
+                        return String(itemStr! + "_" + metricsNames[index])
+                    }
                 } else {
                     var buffStr: String = itemStr!
                     var r: Range<String.Index>? = buffStr.range(of: "_"+operatorsFieldName)
@@ -170,7 +174,11 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
                 return 0
             }
             if blockNames.contains(itemStr){
-                return metricsNames.count
+                if itemStr == "Overall" {
+                    return metricsNames.count - 2
+                } else {
+                    return metricsNames.count
+                }
             } else {
                 var r: Range<String.Index>? = itemStr.range(of: "_"+operatorsFieldName)
                 if r != nil {

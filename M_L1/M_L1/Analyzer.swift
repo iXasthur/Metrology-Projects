@@ -51,6 +51,7 @@ class CodeAnalyzer {
     private let functionBlockName = "def"
     
     private let closedBracketsKey = "(...)"
+    private let closedBracketsKey1 = "{...}"
     
     private let simpleOperators: [String] = ["<<=",">>=","<<<",">>>","<<",">>","&&","||","==","!=","^=","|=","&=","%=","/=","*=","+=","-=",">=","<=","~","&","|","^","!","=",">","<","+","-","*","/","%",";"]
     
@@ -249,6 +250,7 @@ class CodeAnalyzer {
             buffCode.removeFirst(key.count)
             
             var bracketCount = getSymbolCount(in: buffCode, symbol: "(")
+            let bracketCount1 = getSymbolCount(in: buffCode, symbol: "{") - 1
             
             // Finds simple operators
             simpleOperators.forEach({ (op) in
@@ -290,6 +292,10 @@ class CodeAnalyzer {
                 block[key]!.operators.updateValue(bracketCount, forKey: closedBracketsKey)
             }
             
+            if bracketCount1 > 0 {
+                block[key]!.operators.updateValue(bracketCount1, forKey: closedBracketsKey1)
+            }
+            
             if block[key]!.internalBlocks.count != 0 {
                 updateOperatorsRecursion(block: &block[key]!.internalBlocks)
             }
@@ -324,7 +330,7 @@ class CodeAnalyzer {
             // Removes complex operators
             value0.operators.forEach({ (arg1) in
                 let (key1, _) = arg1
-                if key1 != closedBracketsKey {
+                if key1 != closedBracketsKey && key1 != closedBracketsKey1 {
                     var pos: String.Index? = key1.firstIndex(of: "(")
                     if pos != nil {
                         var strToReplace: String = ""
