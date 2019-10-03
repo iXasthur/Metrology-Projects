@@ -158,11 +158,6 @@ def lab(){
 
 }
 
-def lab1(){
-    print((abc),)
-}
-
-
 // Entry point
 def main(args: Array[String]) {
 val ar = Array(6, 2, 8, 5, 1)
