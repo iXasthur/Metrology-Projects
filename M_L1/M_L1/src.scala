@@ -10,11 +10,15 @@ object sort {
 *  arguments of enclosing methods).
 */
 
+
 def sort(a: Array[Int]) {
 /*ANIME-STAR*/
 def swap(i: Int, j: Int) {
-val t = a(i); a(i) = a(j); a(j) = t
+val t = a(i)
+a(i) = a(j)
+a(j) = t
 }
+
 
 def sort1(l: Int, r: Int) {
 val pivot = a((l + r) / 2)
@@ -39,12 +43,15 @@ sort1(l, j)
 if (j < r) {
 sort1(i, r)
 }
+
 }
 
 if (a.length() > 0) {
 sort1(0, a.length() - 1)
 }
+
 }
+
 
 def println(ar: Array[Int]) {
 def print1 = {
@@ -54,6 +61,7 @@ if (ar.length() == 0) "" else iter(0)
 
 Console.println("[" + print1() + "]")
 }
+
 
 def squareEquasion(a:Int,b:Int,c:Int) {
 val d = b*b-4*a*c
@@ -86,7 +94,9 @@ Console.println("All except " + x1)
 if(d<0&&a<0){
 printf("-inf to +inf")
 }
+
 }
+
 
 def myArr() {
 val n = 10
@@ -103,6 +113,7 @@ for( i <- 0 to n-1 ){
 if(a(i)==0){
 counter += 1
 }
+
 }
 
 min = arr(0)
@@ -142,9 +153,15 @@ min = a(i+1)
 }
 }
 
+
 def lab(){
 
 }
+
+def lab1(){
+    print((abc),)
+}
+
 
 // Entry point
 def main(args: Array[String]) {

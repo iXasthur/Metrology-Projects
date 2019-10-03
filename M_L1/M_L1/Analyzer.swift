@@ -50,6 +50,8 @@ class CodeAnalyzer {
     private let objectBlockName = "object"
     private let functionBlockName = "def"
     
+    private let closedBracketsKey = "(...)"
+    
     private let simpleOperators: [String] = ["<<=",">>=","<<<",">>>","<<",">>","&&","||","==","!=","^=","|=","&=","%=","/=","*=","+=","-=",">=","<=","~","&","|","^","!","=",">","<","+","-","*","/","%",";"]
     
     
@@ -228,11 +230,25 @@ class CodeAnalyzer {
         }
     }
     
+    private func getSymbolCount(in s: String, symbol c: Character) -> Int {
+        var count = 0
+        var buffStr = s
+        var pos = buffStr.firstIndex(of: c)
+        while pos != nil {
+            count = count + 1
+            buffStr.remove(at: pos!)
+            pos = buffStr.firstIndex(of: c)
+        }
+        return count
+    }
+    
     private func updateOperatorsRecursion(block: inout [String:CodeBlock]){
         block.forEach { (arg0) in
             let (key, value) = arg0
             var buffCode:String = value.code
             buffCode.removeFirst(key.count)
+            
+            var bracketCount = getSymbolCount(in: buffCode, symbol: "(")
             
             // Finds simple operators
             simpleOperators.forEach({ (op) in
@@ -256,6 +272,7 @@ class CodeAnalyzer {
                 var opArray: [String] = []
                 
                 findComplexOperators(s: &op, arr: &opArray)
+                bracketCount = bracketCount - opArray.count
                 
                 opArray.forEach({ (s) in
                     if block[key]!.operators[s] == nil {
@@ -267,6 +284,10 @@ class CodeAnalyzer {
                 })
                 buffCode.removeSubrange(r!)
                 r = buffCode.range(of: complexOperatorPattern, options: .regularExpression, range: nil, locale: nil)
+            }
+            
+            if bracketCount > 0 {
+                block[key]!.operators.updateValue(bracketCount, forKey: closedBracketsKey)
             }
             
             if block[key]!.internalBlocks.count != 0 {
@@ -303,20 +324,21 @@ class CodeAnalyzer {
             // Removes complex operators
             value0.operators.forEach({ (arg1) in
                 let (key1, _) = arg1
-                
-                var pos: String.Index? = key1.firstIndex(of: "(")
-                if pos != nil {
-                    var strToReplace: String = ""
-                    pos = key1.index(pos!, offsetBy: -1)
-                    strToReplace = String(key1[key1.startIndex...pos!])
-                    strToReplace = #"[^\w]"# + strToReplace + #"[^\w]"#
-                    
-                    var r = buffCode.range(of: strToReplace, options: .regularExpression, range: nil, locale: nil)
-                    while r != nil {
-                        let leftBound = buffCode.index(r!.lowerBound, offsetBy: 1)
-                        let rightBound = buffCode.index(r!.upperBound, offsetBy: -1)
-                        buffCode.removeSubrange(leftBound...rightBound)
-                        r = buffCode.range(of: strToReplace, options: .regularExpression, range: nil, locale: nil)
+                if key1 != closedBracketsKey {
+                    var pos: String.Index? = key1.firstIndex(of: "(")
+                    if pos != nil {
+                        var strToReplace: String = ""
+                        pos = key1.index(pos!, offsetBy: -1)
+                        strToReplace = String(key1[key1.startIndex...pos!])
+                        strToReplace = #"[^\w]"# + strToReplace + #"[^\w]"#
+                        
+                        var r = buffCode.range(of: strToReplace, options: .regularExpression, range: nil, locale: nil)
+                        while r != nil {
+                            let leftBound = buffCode.index(r!.lowerBound, offsetBy: 1)
+                            let rightBound = buffCode.index(r!.upperBound, offsetBy: -1)
+                            buffCode.removeSubrange(leftBound...rightBound)
+                            r = buffCode.range(of: strToReplace, options: .regularExpression, range: nil, locale: nil)
+                        }
                     }
                 }
             })
