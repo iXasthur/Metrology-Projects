@@ -190,8 +190,7 @@ def empty(){
 }
 
 
-// Entry point
-def main(args: Array[String]) {
+def oldmain(args: Array[String]) {
 val ar = Array(6, 2, 8, 5, 1)
 println(ar)
 sort(ar)
@@ -200,6 +199,96 @@ println(ar)
 squareEquasion(5, 10, 4)
 myArray()
 anime(star)
+}
+
+
+// Entry point
+def main(args: Array[String]) {
+/**val ar = Array(6, 2, 8, 5, 1)
+println(ar)
+sort(ar)
+println(ar)
+
+squareEquasion(5, 10, 4)
+Array
+anime(star)*/
+
+val x = Random.nextInt(10)
+
+val season = x
+nigga
+season match {
+    case 1  => Console.println("Winter")
+    case 2  => Console.println("Spring")
+    case 3  => Console.println("Summer")
+    case 4  => Console.println("Autumn")
+    case _  => Console.println("Invalid Season")
+}
+
+var i = 0
+val y = 0
+y = Random.nextInt(10)
+
+val z = 0
+z = Random.nextInt(10)
+
+while (y <= 100){
+        while (x < 100){
+        x += 1
+      if (y = 5) {
+        Console.println("5")
+        x == 5 ? Console.println("x = y") : Console.println("Not equal")
+      }
+      for (z <- 0 to 40){
+           x = x + z - y
+         for (i <- 0 to 2){
+                    for (j <- 0 to 2){
+                    if (i == j) {
+                    matrix(i)(j) = x
+              } else {
+                    matrix(i)(j) = z
+              }
+                  }
+            }
+      }
+    y += 1
+    }
+}
+      
+x = Random.nextInt(10)
+y = Random.nextInt(10)
+if (y == 3) {
+Console.println("3")
+if (x > 3) {
+  Console.println("x greater then 3")
+  if (x > 0){
+    Console.println("x is positive")
+    for (i <- 0 to x-1){
+      if (i == y) {
+      Console.println("This cycle is nonsensical")
+      }
+    }
+  } else {
+    Console.println("x is negative")
+    if (y%x == 0){
+        Console.println("y devides by x")
+    }
+  }
+} else
+    if (y == 5){
+          Console.println("5")
+          if (x == y) {
+              x = 8
+              if (x*y == 40) {
+                  Console.println("It's working")
+              }
+          }
+
+    }
+        
+
+}
+
 }
 
 }

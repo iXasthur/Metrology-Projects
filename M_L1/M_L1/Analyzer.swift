@@ -27,6 +27,10 @@ struct Metrics {
     var n: Int = 0
     var N: Int = 0
     var V: Int = 0
+    
+    var CL:Int = 0
+    var cl:Int = 0
+    var CLI:Int = 0
 }
 
 class CodeAnalyzer {
@@ -41,6 +45,8 @@ class CodeAnalyzer {
     private let functionPattern = #"((def)[^{}]*(\{))([^{}]*)(\})"#
     private let blankLinePattern = #"[\r\n] *[\r\n]"#
     private let unneededSpecesPattern = #" {2,}"#
+    private let floatingSpecesPattern = #"\n *"#
+    private let ternaryOperatorPattern = #"[^\n\r]+\?[^\n\r]*:[^\n\r]*"#
     private let complexOperatorPattern = #"(\w+ {0,1})(\(.*\))"#
     private let closedComplexOperatorPattern = #"(\w+ {0,1})(\([^()]*\))"#
     private let argPattern = #"[(,] *\w+:"#
@@ -51,9 +57,9 @@ class CodeAnalyzer {
     private let functionBlockName = "def"
     
     private let closedBracketsKey = "(...)"
-    private let closedBracketsKey1 = "{...}"
+    private let closedBracketsKey1 = "[...]"
     
-    private let simpleOperators: [String] = ["<<=",">>=","<<<",">>>","<<",">>","&&","||","==","!=","^=","|=","&=","%=","/=","*=","+=","-=",">=","<=","~","&","|","^","!","=",">","<","+","-","*","/","%",";"]
+    private let simpleOperators: [String] = ["<<=",">>=","<<<",">>>","<<",">>","&&","||","==","!=","^=","|=","&=","%=","/=","*=","+=","-=",">=","<=","~","&","|","^","!","=",">","<","+","-","*","/","%",";",","]
     
     
     init(s: String) {
@@ -122,6 +128,15 @@ class CodeAnalyzer {
         while buffCode != s {
             s = buffCode
             buffCode = s.replacingOccurrences(of: unneededSpecesPattern, with: "", options: .regularExpression, range: nil)
+        }
+    }
+    
+    private func removeFloatingSpaces(s: inout String){
+        var buffCode: String = s.replacingOccurrences(of: floatingSpecesPattern, with: "\n", options: .regularExpression, range: nil)
+        
+        while buffCode != s {
+            s = buffCode
+            buffCode = s.replacingOccurrences(of: floatingSpecesPattern, with: "\n", options: .regularExpression, range: nil)
         }
     }
     
@@ -250,7 +265,7 @@ class CodeAnalyzer {
             buffCode.removeFirst(key.count)
             
             var bracketCount = getSymbolCount(in: buffCode, symbol: "(")
-            let bracketCount1 = getSymbolCount(in: buffCode, symbol: "{") - 1
+            let bracketCount1 = getSymbolCount(in: buffCode, symbol: "[")
             
             // Finds simple operators
             simpleOperators.forEach({ (op) in
@@ -350,7 +365,7 @@ class CodeAnalyzer {
             })
             
             // Clears string
-            let symbolsToRemove: [String] = ["(",")",",",".","{","}","val","var","else"]
+            let symbolsToRemove: [String] = ["(",")",".","{","}","val","var","else","_","?",":","match"]
             symbolsToRemove.forEach({ (sym) in
                 buffCode = buffCode.replacingOccurrences(of: sym, with: " ")
             })
@@ -417,6 +432,9 @@ class CodeAnalyzer {
         countOverallMetrics(block: &mainBlocks.internalBlocks)
         metrics.n = metrics.n1 + metrics.n2
         metrics.N = metrics.N1 + metrics.N2
+//        metrics.CL = 101
+//        metrics.cl = 102
+//        metrics.CLI = 103
         if metrics.n > 0 {
             metrics.V = metrics.N*Int(log2(Double(metrics.n)))
         }
@@ -475,6 +493,67 @@ class CodeAnalyzer {
         return arr
     }
     
+    private func transformTernaryOperatorToStd(op: String) -> String {
+        var str: String = op
+        while str[str.startIndex] == " " {
+            str.removeFirst()
+        }
+//        removeUnneededSpaces(s: &str)
+        str.append("}")
+        str.insert(contentsOf: "if ( ", at: str.startIndex)
+        let p1: String.Index = str.firstIndex(of: "?")!
+        str.remove(at: p1)
+        str.insert(contentsOf: ") {\n", at: p1)
+        let p2: String.Index = str.firstIndex(of: ":")!
+        str.remove(at: p2)
+        str.insert(contentsOf: "\n} else {\n", at: p2)
+        
+        str.append("\n")
+        return str
+    }
+    
+    private func transformMatchOperatorToStd(op: String) -> String {
+        var str: String = ">>>><<<<"
+        print(op)
+        
+        str.append("\n")
+        return str
+    }
+    
+    private func getJilbMetricsFromBlock(str: String, mt: inout Metrics){
+        var newStr: String = str
+//        mt.CL = 10000
+//        mt.cl = 10001
+//        mt.CLI = 10002
+//        removeUnneededSpaces(s: &cleanStr)
+//        removeFloatingSpaces(s: &cleanStr)
+        var rng:Range<String.Index>? = newStr.range(of: ternaryOperatorPattern, options: .regularExpression, range: nil, locale: nil)
+        while rng != nil {
+            let first: String.Index = rng!.lowerBound
+            let newOperator: String = transformTernaryOperatorToStd(op: String(newStr[first...rng!.upperBound]))
+            newStr.removeSubrange(first...rng!.upperBound)
+            newStr.insert(contentsOf: newOperator, at: first)
+            rng = newStr.range(of: ternaryOperatorPattern, options: .regularExpression, range: nil, locale: nil)
+        }
+        
+        
+        var blockDictionary:[String : Range<String.Index>] = findBlock(in: newStr, startingWith: "match")
+        while blockDictionary != [:] {
+            rng = blockDictionary["match"]
+            if rng == nil {
+                rng = blockDictionary["match "]
+            }
+            
+            let newOperator: String = transformMatchOperatorToStd(op: String(newStr[rng!.lowerBound...rng!.upperBound]))
+            newStr.removeSubrange(rng!)
+            newStr.insert(contentsOf: newOperator, at: rng!.lowerBound)
+            
+            blockDictionary = findBlock(in: newStr, startingWith: "match")
+        }
+        
+//        print(newStr)
+    }
+    
     private func getBlockMetrics(block: inout [String:CodeBlock], name: inout String?, mt: inout Metrics) {
         block.forEach { (arg0) in
             let (key, value) = arg0
@@ -497,6 +576,8 @@ class CodeAnalyzer {
                     if mt.n > 0 {
                         mt.V = mt.N*Int(log2(Double(mt.n)))
                     }
+                    
+                    getJilbMetricsFromBlock(str: value.code, mt: &mt)
                     
                     name = nil
                 }
@@ -535,6 +616,12 @@ class CodeAnalyzer {
                 m = buffMetrics.N
             case "V":
                 m = buffMetrics.V
+            case "CL":
+                m = buffMetrics.CL
+            case "cl":
+                m = buffMetrics.cl
+            case "CLI":
+                m = buffMetrics.CLI
             default:
                 m = 0
             }
@@ -559,6 +646,12 @@ class CodeAnalyzer {
             m = metrics.N
         case "V":
             m = metrics.V
+        case "CL":
+            m = metrics.CL
+        case "cl":
+            m = metrics.cl
+        case "CLI":
+            m = metrics.CLI
         default:
             m = 0
         }

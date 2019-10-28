@@ -13,6 +13,8 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
     var blockNames: [String] = ["Overall"]
     let operandsFieldName:String = "Operands(f2)"
     let operatorsFieldName:String = "Operators(f1)"
+    let jilbMetricsNames:[String] = ["CL","cl","CLI"]
+    let emptyMetricIdentifier:String = "%EMPTY%"
     var metricsNames: [String] = ["n1","n2","N1","N2","n","N","V"]
     var operatorsDictiotary: [String:[String:Int]] = [:]
     var operatorsDictionarySortedKeysDictionary: [String:[String]] = [:]
@@ -34,8 +36,14 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
     }
     
     override func viewDidLoad() {
+//        metricsNames.append(emptyMetricIdentifier)
         metricsNames.append(operatorsFieldName)
         metricsNames.append(operandsFieldName)
+        
+        metricsNames.append(emptyMetricIdentifier)
+        jilbMetricsNames.forEach { (m) in
+            metricsNames.append(m)
+        }
         super.viewDidLoad()
         
         var source: String = ""
@@ -115,8 +123,16 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
         } else {
             if itemStr != nil {
                 if blockNames.contains(itemStr!) {
-                    if itemStr == "Overall" && (metricsNames[index] == operandsFieldName || metricsNames[index] == operatorsFieldName) {
-                        return 0
+                    if itemStr == "Overall" {
+                        if  (metricsNames[index] == operandsFieldName || metricsNames[index] == operatorsFieldName) {
+                            return String(itemStr! + "_" + metricsNames[index+2])
+                        } else {
+                            if index < metricsNames.firstIndex(of: emptyMetricIdentifier) ?? 0 {
+                                return String(itemStr! + "_" + metricsNames[index])
+                            } else {
+                                return String(itemStr! + "_" + metricsNames[index+2])
+                            }
+                        }
                     } else {
                         return String(itemStr! + "_" + metricsNames[index])
                     }
@@ -228,7 +244,6 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
         guard let columnIdentifier = tableColumn?.identifier.rawValue else {
             return nil
         }
-        
         var text = ""
         
         // Recall that `item` is the row identiffier
@@ -254,6 +269,10 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
                 }
             }
             
+            if text == emptyMetricIdentifier {
+                text = ""
+            }
+            
 //            text = item
         case ("keyColumn", _):
             // Remember that we identified the hobby sub-rows differently
@@ -261,7 +280,7 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
         case ("valueColumn", let item as String):
             let ident: String? = clearItemIdentifier(s: item)
             if ident != nil {
-                let blockedStrings: [String] = [operatorsFieldName, operandsFieldName]
+                let blockedStrings: [String] = [operatorsFieldName, operandsFieldName, emptyMetricIdentifier]
                 var check: Bool = true
                 blockedStrings.forEach { (s) in
                     if item.range(of: s) != nil {
