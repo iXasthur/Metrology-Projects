@@ -216,7 +216,6 @@ anime(star)*/
 val x = Random.nextInt(10)
 
 val season = x
-nigga
 season match {
     case 1  => Console.println("Winter")
     case 2  => Console.println("Spring")
