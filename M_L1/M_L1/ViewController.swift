@@ -290,7 +290,18 @@ class ViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewData
                 if check && metricsNames.contains(ident!) {
                     blockNames.forEach { (s) in
                         if item.hasPrefix(s){
-                            text = String(analyzer.getMetricsOfBlock(name: s, t: ident!))
+                            let value: Float = analyzer.getMetricsOfBlock(name: s, t: ident!)
+                            let decimal = value.truncatingRemainder(dividingBy: 1)
+                            if decimal > 0 {
+                                text = String(value)
+                            } else {
+                                if value > 0 {
+                                    text = String(Int(value))
+                                } else {
+                                    text = "0"
+                                }
+                            }
+                            
                         }
                     }
                 } else

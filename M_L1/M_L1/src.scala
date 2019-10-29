@@ -26,8 +26,12 @@ var i = l
 var j = r
 
 while (i <= j) {
-while (a(i) < pivot) i += 1
-while (a(j) > pivot) j -= 1
+while (a(i) < pivot) {
+    i += 1
+}
+while (a(j) > pivot) {
+    j -= 1
+}
 
 if (i <= j) {
 swap(i, j)
@@ -55,8 +59,7 @@ sort1(0, a.length() - 1)
 
 def println(ar: Array[Int]) {
 def print1() {
-iter() = ar(i) + (if (i < ar.length()-1) "," + iter(i+1) else "")
-if (ar.length() == 0) "" else iter(0)
+    iter = 50
 }
 
 Console.println("[" + print1() + "]")
@@ -71,32 +74,40 @@ val x2 = (-b - di)/(2*a);
 
 x0 = -c/b
 if(a==0&&b<0){
-Console.println("-inf to " + x0)
-} else
-if(a==0&&b>0){
-Console.println(x0 + " to +inf")
-} else
-if(d>0&&a>0){
-Console.println(x1 + " to " + x2)
-} else
-if(d>0&&a>0){
-Console.println(x2 + " to " + x1)
-} else
-if(d>0&&a<0){
-Console.println("-inf to " + x1 + ", " + x2 + " to +inf" )
-} else
-if(d<=0&&a>0){
-swap(x1, x2)
-Console.println("No solution")
-} else
-if(d==0&&a<0){
-val test = 900
-swap(x3, x4)
-Console.println("All except " + x1)
-} else
-if(d<0&&a<0){
-printf("-inf to +inf")
+    Console.println("-inf to " + x0)
+} else {
+    if(a==0&&b>0){
+        Console.println(x0 + " to +inf")
+    } else {
+        if(d>0&&a>0){
+            Console.println(x1 + " to " + x2)
+        } else {
+            if(d>0&&a>0){
+                Console.println(x2 + " to " + x1)
+            } else {
+                if(d>0&&a<0){
+                    Console.println("-inf to " + x1 + ", " + x2 + " to +inf" )
+                } else {
+                    if(d<=0&&a>0){
+                        swap(x1, x2)
+                        Console.println("No solution")
+                    } else {
+                        if(d==0&&a<0){
+                            val test = 900
+                            swap(x3, x4)
+                            Console.println("All except " + x1)
+                        } else {
+                            if(d<0&&a<0){
+                                printf("-inf to +inf")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
+                
 
 for(i <- 0 to n-1){
 if(min > a(i)){
@@ -213,79 +224,81 @@ squareEquasion(5, 10, 4)
 Array
 anime(star)*/
 
-val x = Random.nextInt(10)
+val x = Random.nextInt(100)
 
 val season = x
 season match {
-    case 1  => Console.println("Winter")
-    case 2  => Console.println("Spring")
-    case 3  => Console.println("Summer")
-    case 4  => Console.println("Autumn")
-    case _  => Console.println("Invalid Season")
+case 1 => {
+    Console.println("Winter")
+}
+case 2 => {
+    Console.println("Spring")
+}
+case 3 => {
+    Console.println("Summer")
+}
+case 4 => {
+    Console.println("Autumn")
+}
+case _ => {
+    Console.println("Invalid Season")
+}
 }
 
 var i = 0
 val y = 0
-y = Random.nextInt(10)
+y = Random.nextInt(100)
 
 val z = 0
-z = Random.nextInt(10)
+z = Random.nextInt(100)
 
 while (y <= 100){
-        while (x < 100){
-        x += 1
-      if (y = 5) {
-        Console.println("5")
-        x == 5 ? Console.println("x = y") : Console.println("Not equal")
-      }
-      for (z <- 0 to 40){
-           x = x + z - y
-         for (i <- 0 to 2){
-                    for (j <- 0 to 2){
-                    if (i == j) {
-                    matrix(i)(j) = x
-              } else {
-                    matrix(i)(j) = z
-              }
-                  }
-            }
-      }
-    y += 1
+    while (x < 100){
+          x += 1
+          if (y = 5) {
+                Console.println("5")
+                x==5 ? Console.println("x = y") : Console.println("Not equal")
+          }
+          for (z <- 0 to 40){
+               x = x + z - y
+               for (i <- 0 to 2){
+                      for (j <- 0 to 2){
+                            matrix(i)(j) = x
+                      }
+               }
+          }
     }
+      
+    y += 1
 }
       
 x = Random.nextInt(10)
 y = Random.nextInt(10)
 if (y == 3) {
-Console.println("3")
-if (x > 3) {
-  Console.println("x greater then 3")
-  if (x > 0){
-    Console.println("x is positive")
-    for (i <- 0 to x-1){
-      if (i == y) {
-      Console.println("This cycle is nonsensical")
-      }
-    }
-  } else {
-    Console.println("x is negative")
-    if (y%x == 0){
-        Console.println("y devides by x")
-    }
-  }
-} else
-    if (y == 5){
-          Console.println("5")
-          if (x == y) {
-              x = 8
-              if (x*y == 40) {
-                  Console.println("It's working")
-              }
+    Console.println("3")
+    if (x > 3) {
+          Console.println("x greater then 3")
+          if (x > 0){
+                Console.println("x is positive")
+                for (i <- 0 to x-1){
+                    Console.println("This cycle is nonsensical")
+                }
+          } else {
+                Console.println("x is negative")
+                if (y%x == 0){
+                    Console.println("y devides by x")
+                }
           }
+    } else {
+              Console.println("5")
+              if (x == y) {
+                  x = 8
+                  if (x*y == 40) {
+                      Console.println("It's working")
+                  }
+              }
 
-    }
-        
-
+        }
 }
 
 }

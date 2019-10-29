@@ -28,9 +28,9 @@ struct Metrics {
     var N: Int = 0
     var V: Int = 0
     
-    var CL:Int = 0
-    var cl:Int = 0
-    var CLI:Int = 0
+    var CL: Int = 0
+    var cl: Float = 0
+    var CLI: Int = 0
 }
 
 class CodeAnalyzer {
@@ -385,12 +385,22 @@ class CodeAnalyzer {
             }
             while i<buffCode.endIndex {
                 if buffCode[i] == " " {
-                    if block[key0]?.operands[buffStr] == nil {
-                        block[key0]!.operands.updateValue(1, forKey: buffStr)
+                    if buffStr == "case" {
+                        if block[key0]?.operators["if(...)"] == nil {
+                            block[key0]!.operators.updateValue(1, forKey: "if(...)")
+                        } else {
+                            let lastVal: Int? = block[key0]!.operators["if(...)"]
+                            block[key0]!.operators.updateValue(lastVal! + 1, forKey: "if(...)")
+                        }
                     } else {
-                        let lastVal: Int? = block[key0]!.operands[buffStr]
-                        block[key0]!.operands.updateValue(lastVal! + 1, forKey: buffStr)
+                        if block[key0]?.operands[buffStr] == nil {
+                            block[key0]!.operands.updateValue(1, forKey: buffStr)
+                        } else {
+                            let lastVal: Int? = block[key0]!.operands[buffStr]
+                            block[key0]!.operands.updateValue(lastVal! + 1, forKey: buffStr)
+                        }
                     }
+                    
                     buffStr = ""
                 } else {
                     buffStr = buffStr + String(buffCode[i])
@@ -445,7 +455,7 @@ class CodeAnalyzer {
             updateObjectBlock()
             updateInternalBlocksRecursion(block: &mainBlocks.internalBlocks)
             updateOperatorsRecursion(block: &mainBlocks.internalBlocks)
-            updateOperandsRecursion(block: &mainBlocks.internalBlocks)
+            updateOperandsRecursion(block: &mainBlocks.internalBlocks) // CALL AFTER OPERATORS SEARCH !
             updateMetricsValues()
         }
     }
@@ -513,20 +523,82 @@ class CodeAnalyzer {
     }
     
     private func transformMatchOperatorToStd(op: String) -> String {
-        var str: String = ">>>><<<<"
-        print(op)
+        var str: String = op
+        var alternatives: [String] = []
+        var defaultAlternative: String = ""
         
-        str.append("\n")
+        while str[str.startIndex] != "{"{
+            str.removeFirst()
+        }
+        str.removeFirst()
+        str.remove(at: str.lastIndex(of: "}")!)
+        if str[str.startIndex] == "\n"{
+            str.removeFirst()
+        }
+        
+        let rng: Range<String.Index>? = str.range(of: "case _ =>")
+        if rng != nil {
+            defaultAlternative = String(str[str.index(after: str.lastIndex(of: "{")!)...str.index(before: str.lastIndex(of: "}")!)])
+            str.removeSubrange(rng!.lowerBound...str.index(before: str.endIndex))
+        }
+        
+        var p: String.Index? = str.firstIndex(of: "{")
+        while p != nil {
+            let p2: String.Index? = str.firstIndex(of: "}")
+            alternatives.append(String(str[p!...str.index(before: p2!)]))
+            str.removeSubrange(p!...p2!)
+            p = str.firstIndex(of: "{")
+        }
+        
+        str = ""
+        
+        if alternatives.count > 0 {
+            alternatives.forEach { (alt) in
+                str.append("if ( _ ) ")
+                str.append(alt)
+            }
+            
+            str.append(defaultAlternative)
+            
+            for _ in 0...alternatives.count-1{
+                str.append("}\n")
+            }
+            
+            str.removeLast()
+        }
+        removeBlankLines(s: &str)
+        removeFloatingSpaces(s: &str)
+        str.insert("\n", at: str.startIndex)
+//        print(op)
+//        print(alternatives)
+//        print(defaultAlternative)
+//        print(str)
         return str
     }
     
+    private func getMaxNesting(str: String) -> Int {
+        var buffNesting: Int = -1
+        var buffMaxNesting: Int = 0
+        var p: String.Index = str.startIndex
+        while p < str.endIndex {
+            if str[p] == "{" {
+                buffNesting = buffNesting + 1
+                if buffNesting > buffMaxNesting {
+                    buffMaxNesting = buffNesting
+                }
+            } else
+                if str[p] == "}" {
+                    buffNesting = buffNesting - 1
+                }
+            p = str.index(after: p)
+        }
+//        print(buffMaxNesting)
+        return buffMaxNesting
+    }
+    
+    
     private func getJilbMetricsFromBlock(str: String, mt: inout Metrics){
         var newStr: String = str
-//        mt.CL = 10000
-//        mt.cl = 10001
-//        mt.CLI = 10002
-//        removeUnneededSpaces(s: &cleanStr)
-//        removeFloatingSpaces(s: &cleanStr)
         var rng:Range<String.Index>? = newStr.range(of: ternaryOperatorPattern, options: .regularExpression, range: nil, locale: nil)
         while rng != nil {
             let first: String.Index = rng!.lowerBound
@@ -539,10 +611,8 @@ class CodeAnalyzer {
         
         var blockDictionary:[String : Range<String.Index>] = findBlock(in: newStr, startingWith: "match")
         while blockDictionary != [:] {
-            rng = blockDictionary["match"]
-            if rng == nil {
-                rng = blockDictionary["match "]
-            }
+            let k: String = blockDictionary.keys.first!
+            rng = blockDictionary[k]
             
             let newOperator: String = transformMatchOperatorToStd(op: String(newStr[rng!.lowerBound...rng!.upperBound]))
             newStr.removeSubrange(rng!)
@@ -550,6 +620,40 @@ class CodeAnalyzer {
             
             blockDictionary = findBlock(in: newStr, startingWith: "match")
         }
+        
+        newStr = newStr.replacingOccurrences(of: "if(", with: "if (")
+        newStr = newStr.replacingOccurrences(of: "while(", with: "if (")
+        newStr = newStr.replacingOccurrences(of: "for(", with: "if (")
+        newStr = newStr.replacingOccurrences(of: "while (", with: "if (")
+        newStr = newStr.replacingOccurrences(of: "for (", with: "if (")
+        newStr = newStr.replacingOccurrences(of: "} else {", with: "")
+        
+        newStr.remove(at: newStr.lastIndex(of: "}")!)
+        
+        while newStr[newStr.startIndex] != "{"{
+            newStr.removeFirst()
+        }
+        newStr.removeFirst()
+        
+        mt.CL = newStr.components(separatedBy: "if (").count - 1
+        mt.cl = Float(mt.CL)/Float(mt.N1)
+        
+        blockDictionary = findBlock(in: newStr, startingWith: "if (")
+        while blockDictionary != [:] {
+            let k: String = blockDictionary.keys.first!
+            rng = blockDictionary[k]
+            
+            let buffNesting: Int = getMaxNesting(str: String(newStr[rng!]))
+            print(blockDictionary)
+            print("Nesting: ",buffNesting)
+            if buffNesting > mt.CLI {
+                mt.CLI = buffNesting
+            }
+            newStr.removeSubrange(rng!)
+
+            blockDictionary = findBlock(in: newStr, startingWith: "if (")
+        }
+        
         
 //        print(newStr)
     }
@@ -589,8 +693,8 @@ class CodeAnalyzer {
         }
     }
     
-    func getMetricsOfBlock(name: String, t: String) -> Int {
-        let m: Int
+    func getMetricsOfBlock(name: String, t: String) -> Float {
+        let m: Float
         if name == "Overall" {
             m = getOverallMetrics(t: t)
         } else {
@@ -603,25 +707,25 @@ class CodeAnalyzer {
             }
             switch t {
             case "n1":
-                m = buffMetrics.n1
+                m = Float(buffMetrics.n1)
             case "n2":
-                m = buffMetrics.n2
+                m = Float(buffMetrics.n2)
             case "N1":
-                m = buffMetrics.N1
+                m = Float(buffMetrics.N1)
             case "N2":
-                m = buffMetrics.N2
+                m = Float(buffMetrics.N2)
             case "n":
-                m = buffMetrics.n
+                m = Float(buffMetrics.n)
             case "N":
-                m = buffMetrics.N
+                m = Float(buffMetrics.N)
             case "V":
-                m = buffMetrics.V
+                m = Float(buffMetrics.V)
             case "CL":
-                m = buffMetrics.CL
+                m = Float(buffMetrics.CL)
             case "cl":
                 m = buffMetrics.cl
             case "CLI":
-                m = buffMetrics.CLI
+                m = Float(buffMetrics.CLI)
             default:
                 m = 0
             }
@@ -629,29 +733,29 @@ class CodeAnalyzer {
         return m
     }
     
-    private func getOverallMetrics(t: String) -> Int{
-        let m: Int
+    private func getOverallMetrics(t: String) -> Float{
+        let m: Float
         switch t {
         case "n1":
-            m = metrics.n1
+            m = Float(buffMetrics.n1)
         case "n2":
-            m = metrics.n2
+            m = Float(buffMetrics.n2)
         case "N1":
-            m = metrics.N1
+            m = Float(buffMetrics.N1)
         case "N2":
-            m = metrics.N2
+            m = Float(buffMetrics.N2)
         case "n":
-            m = metrics.n
+            m = Float(buffMetrics.n)
         case "N":
-            m = metrics.N
+            m = Float(buffMetrics.N)
         case "V":
-            m = metrics.V
+            m = Float(buffMetrics.V)
         case "CL":
-            m = metrics.CL
+            m = Float(buffMetrics.CL)
         case "cl":
-            m = metrics.cl
+            m = buffMetrics.cl
         case "CLI":
-            m = metrics.CLI
+            m = Float(buffMetrics.CLI)
         default:
             m = 0
         }
