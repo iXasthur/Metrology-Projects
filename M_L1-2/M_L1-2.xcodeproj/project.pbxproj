@@ -16,13 +16,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		51BA285B233BCA7000CEC8DD /* M_L1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = M_L1.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		51BA285B233BCA7000CEC8DD /* M_L1-2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "M_L1-2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		51BA285E233BCA7000CEC8DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		51BA2860233BCA7000CEC8DD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		51BA2862233BCA7100CEC8DD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		51BA2865233BCA7100CEC8DD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		51BA2867233BCA7100CEC8DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		51BA2868233BCA7100CEC8DD /* M_L1.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = M_L1.entitlements; sourceTree = "<group>"; };
+		51BA2868233BCA7100CEC8DD /* M_L1-2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "M_L1-2.entitlements"; sourceTree = "<group>"; };
 		51C67F712344DC4700CF5A57 /* Analyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analyzer.swift; sourceTree = "<group>"; };
 		51C67F732344DC8700CF5A57 /* src.scala */ = {isa = PBXFileReference; lastKnownFileType = text; path = src.scala; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -41,7 +41,8 @@
 		51BA2852233BCA7000CEC8DD = {
 			isa = PBXGroup;
 			children = (
-				51BA285D233BCA7000CEC8DD /* M_L1 */,
+				51BA285D233BCA7000CEC8DD /* M_L1-2 */,
+				51BA2867233BCA7100CEC8DD /* Info.plist */,
 				51BA285C233BCA7000CEC8DD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -49,12 +50,12 @@
 		51BA285C233BCA7000CEC8DD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				51BA285B233BCA7000CEC8DD /* M_L1.app */,
+				51BA285B233BCA7000CEC8DD /* M_L1-2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		51BA285D233BCA7000CEC8DD /* M_L1 */ = {
+		51BA285D233BCA7000CEC8DD /* M_L1-2 */ = {
 			isa = PBXGroup;
 			children = (
 				51BA285E233BCA7000CEC8DD /* AppDelegate.swift */,
@@ -62,19 +63,18 @@
 				51C67F712344DC4700CF5A57 /* Analyzer.swift */,
 				51BA2862233BCA7100CEC8DD /* Assets.xcassets */,
 				51BA2864233BCA7100CEC8DD /* Main.storyboard */,
-				51BA2867233BCA7100CEC8DD /* Info.plist */,
-				51BA2868233BCA7100CEC8DD /* M_L1.entitlements */,
+				51BA2868233BCA7100CEC8DD /* M_L1-2.entitlements */,
 				51C67F732344DC8700CF5A57 /* src.scala */,
 			);
-			path = M_L1;
+			path = "M_L1-2";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		51BA285A233BCA7000CEC8DD /* M_L1 */ = {
+		51BA285A233BCA7000CEC8DD /* M_L1-2 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 51BA286B233BCA7100CEC8DD /* Build configuration list for PBXNativeTarget "M_L1" */;
+			buildConfigurationList = 51BA286B233BCA7100CEC8DD /* Build configuration list for PBXNativeTarget "M_L1-2" */;
 			buildPhases = (
 				51BA2857233BCA7000CEC8DD /* Sources */,
 				51BA2858233BCA7000CEC8DD /* Frameworks */,
@@ -84,9 +84,9 @@
 			);
 			dependencies = (
 			);
-			name = M_L1;
+			name = "M_L1-2";
 			productName = M_L1;
-			productReference = 51BA285B233BCA7000CEC8DD /* M_L1.app */;
+			productReference = 51BA285B233BCA7000CEC8DD /* M_L1-2.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -96,7 +96,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1030;
-				LastUpgradeCheck = 1030;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "Mikhail Kavaleuski";
 				TargetAttributes = {
 					51BA285A233BCA7000CEC8DD = {
@@ -104,7 +104,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 51BA2856233BCA7000CEC8DD /* Build configuration list for PBXProject "M_L1" */;
+			buildConfigurationList = 51BA2856233BCA7000CEC8DD /* Build configuration list for PBXProject "M_L1-2" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -117,7 +117,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				51BA285A233BCA7000CEC8DD /* M_L1 */,
+				51BA285A233BCA7000CEC8DD /* M_L1-2 */,
 			);
 		};
 /* End PBXProject section */
@@ -279,11 +279,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = M_L1/M_L1.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "M_L1-2/M_L1-2.entitlements";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 2RFRHVPMQL;
-				INFOPLIST_FILE = M_L1/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -298,11 +299,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = M_L1/M_L1.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "M_L1-2/M_L1-2.entitlements";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 2RFRHVPMQL;
-				INFOPLIST_FILE = M_L1/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -316,7 +318,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		51BA2856233BCA7000CEC8DD /* Build configuration list for PBXProject "M_L1" */ = {
+		51BA2856233BCA7000CEC8DD /* Build configuration list for PBXProject "M_L1-2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				51BA2869233BCA7100CEC8DD /* Debug */,
@@ -325,7 +327,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		51BA286B233BCA7100CEC8DD /* Build configuration list for PBXNativeTarget "M_L1" */ = {
+		51BA286B233BCA7100CEC8DD /* Build configuration list for PBXNativeTarget "M_L1-2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				51BA286C233BCA7100CEC8DD /* Debug */,
