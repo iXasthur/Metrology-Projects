@@ -644,8 +644,8 @@ class CodeAnalyzer {
             rng = blockDictionary[k]
             
             let buffNesting: Int = getMaxNesting(str: String(newStr[rng!]))
-            print(blockDictionary)
-            print("Nesting: ",buffNesting)
+//            print(blockDictionary)
+//            print("Nesting: ",buffNesting)
             if buffNesting > mt.CLI {
                 mt.CLI = buffNesting
             }
