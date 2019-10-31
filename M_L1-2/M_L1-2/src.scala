@@ -224,9 +224,38 @@ squareEquasion(5, 10, 4)
 Array
 anime(star)*/
 
+val pivot = a((l + r) / 2)
+var i = l
+var j = r
+
+while (i <= j) {
+while (a(i) < pivot) {
+    i += 1
+}
+while (a(j) > pivot) {
+    j -= 1
+}
+
+if (i <= j) {
+swap(i, j)
+i += 1
+j -= 1
+}
+}
+
+if (l < j) {
+sort1(l, j)
+}
+
+if (j < r) {
+sort1(i, r)
+}
+
+
 val x = Random.nextInt(100)
 
 val season = x
+for ( x <- 5 to 50) {
 season match {
 case 1 => {
     Console.println("Winter")
@@ -240,8 +269,12 @@ case 3 => {
 case 4 => {
     Console.println("Autumn")
 }
+case 5 => {
+    Console.println("Autumn")
+}
 case _ => {
     Console.println("Invalid Season")
+}
 }
 }
 
