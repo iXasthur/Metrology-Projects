@@ -21,17 +21,23 @@ object sort {
     
     // Entry point
     def main(args: Array[String]) {
-
+        
+        var zzz = 1
         var i = Console.readInt().negative()
         var x = 1
         var y = 10
         val a:Int = Console.readInt()
-        val b:Int = -2
-        val c:Int = 20 + x - a / y * i
-        var d:String
+        val b:Int = -2*ivanov*abs(pow((2+2),lsp(x)))<<chikibamboni(i)*nadenenko
+        val c:Int = 20 + i - i / x * i >> 5 % 3
+        var d:String = zzz.toStr()
         var e:String = ""
         var f:String = e
         
+        Chikibambony(i,x,y,(minecraft,""))
+        if (f == (d+args)) {
+            a = e + c
+            f = a + e + c
+        }
         /*
         i match {
             case 1 => {

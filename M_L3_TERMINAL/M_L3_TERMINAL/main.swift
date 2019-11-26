@@ -21,7 +21,7 @@ func main() -> Int{
     
     let Analyzer: CodeAnalyzer = CodeAnalyzer(s: source)
     print("---------------------------------")
-//    Analyzer.outputVariables()
+    Analyzer.outputVariables()
 //    Analyzer.outputCode()
     
     return 0
