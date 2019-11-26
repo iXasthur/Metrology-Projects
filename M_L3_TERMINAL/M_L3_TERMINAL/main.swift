@@ -14,14 +14,15 @@ func main() -> Int{
     
     do {
         source = try String(contentsOf: Bundle.main.url(forResource: "src", withExtension: "scala")!)
-        print("Succesfuly loaded source code!")
-        print()
+        print("-> Succesfuly loaded source code!")
     } catch let err {
         fatalError(err.localizedDescription)
     }
     
     let Analyzer: CodeAnalyzer = CodeAnalyzer(s: source)
-    Analyzer.outputCode()
+    print("---------------------------------")
+//    Analyzer.outputVariables()
+//    Analyzer.outputCode()
     
     return 0
 }

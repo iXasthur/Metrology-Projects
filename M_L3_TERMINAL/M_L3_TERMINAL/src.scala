@@ -8,14 +8,31 @@ object sort {
     *  visible in their scope (including local variables or
     *  arguments of enclosing methods).
     */
-
+    
+    def qwe() {
+        def qwe1 {
+            def qwe2() {
+                def qwe3 {
+                
+                }
+            }
+        }
+    }
+    
     // Entry point
     def main(args: Array[String]) {
 
-        var i = 0
-        var x =     0
-        var y = 0
-
+        var i = Console.readInt().negative()
+        var x = 1
+        var y = 10
+        val a:Int = Console.readInt()
+        val b:Int = -2
+        val c:Int = 20 + x - a / y * i
+        var d:String
+        var e:String = ""
+        var f:String = e
+        
+        /*
         i match {
             case 1 => {
                 Console.println("Winter")
@@ -54,6 +71,7 @@ object sort {
                 Console.println("x is lower or equals to 3")
             }
         }
+        */
 
     }
 
