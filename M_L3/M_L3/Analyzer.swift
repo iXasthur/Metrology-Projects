@@ -28,19 +28,43 @@ class CodeAnalyzer {
     }
     
     private struct Metrics {
+        
+        static let a1: Double = 1
+        static let a2: Double = 2
+        static let a3: Double = 3
+        static let a4: Double = 0.5
+        
         var P: [String] = []
         var M: [String] = []
         var C: [String] = []
         var T: [String] = []
         
         var Q: Double = 0
+        
         mutating func calcQ() {
-            let a1: Double = 1
-            let a2: Double = 2
-            let a3: Double = 3
-            let a4: Double = 0.5
-            let buffQ = a1*Double(P.count) + a2*Double(M.count) + a3*Double(C.count) + a4*Double(T.count)
+            let buffQ = CodeAnalyzer.Metrics.a1*Double(P.count) + CodeAnalyzer.Metrics.a2*Double(M.count) + CodeAnalyzer.Metrics.a3*Double(C.count) + CodeAnalyzer.Metrics.a4*Double(T.count)
             self = Metrics(P: P, M: M, C: C, T: T, Q: buffQ)
+        }
+        
+        func getQStr() -> String {
+            var ret: String = ""
+            ret = ret + String(CodeAnalyzer.Metrics.a1)
+            ret = ret + "*"
+            ret = ret + String(P.count)
+            ret = ret + " + "
+            ret = ret + String(CodeAnalyzer.Metrics.a2)
+            ret = ret + "*"
+            ret = ret + String(M.count)
+            ret = ret + " + "
+            ret = ret + String(CodeAnalyzer.Metrics.a3)
+            ret = ret + "*"
+            ret = ret + String(C.count)
+            ret = ret + " + "
+            ret = ret + String(CodeAnalyzer.Metrics.a4)
+            ret = ret + "*"
+            ret = ret + String(T.count)
+            ret = ret + " = " + String(Q)
+            return ret
         }
     }
     
@@ -70,7 +94,8 @@ class CodeAnalyzer {
     private let variableTypePattern = #" ?: ?[\w\[\]]+ ?"#
     private let variableModificationPattern = #"\w+ ?=[^=]"# // Finds 1 more symbol after =
     private let variableNamePattern = #"[a-zA-Z][a-zA-Z0-9]*"#
-    private let variableOutputPattern = #"(Console.println)"#
+    private let variableOutputPattern = #"(Console\.println)"#
+    private let variableInputPattern = #"(\w+) ?= ?(Console\.read)"#
     
     private let objectBlockBeginningPattern = #"(object) \w+ ?\{"#
     private let defBlockBeginningPattern = #"(def) \w+( ?\(.*\))? ?\{"#
@@ -412,6 +437,14 @@ class CodeAnalyzer {
             buffStr.removeSubrange(rng!)
             rng = buffStr.range(of: variableOutputPattern, options: .regularExpression)
         }
+        buffStr = str
+        rng = buffStr.range(of: variableInputPattern, options: .regularExpression)
+        while rng != nil {
+            var s: String = String(buffStr[rng!])
+            outputVariables = outputVariables + extractVariablesFormComplexOperator(in: &s)
+            buffStr.removeSubrange(rng!)
+            rng = buffStr.range(of: variableInputPattern, options: .regularExpression)
+        }
         if variablesArray.count > 0 {
             for i in 0...variablesArray.count-1 {
                 outputVariables.forEach { (v) in
@@ -423,44 +456,44 @@ class CodeAnalyzer {
         }
     }
     
-    private func getMetricsGroup(of v: ScalaVariable) -> [Metric_Group] {
-        var ret: [Metric_Group] = []
-        if v.isControlVariable {
-            ret = ret + [.C]
-        } else {
-            if (!v.wasUsed) {
-                ret = ret + [.T]
-            }
-            if v.isInputVariable && !v.wasModified {
-                ret = ret + [.P]
-            } else {
-                ret = ret + [.M]
-            }
-        }
-        return ret
-    }
-    
-//    // No M and T intersection
 //    private func getMetricsGroup(of v: ScalaVariable) -> [Metric_Group] {
 //        var ret: [Metric_Group] = []
 //        if v.isControlVariable {
 //            ret = ret + [.C]
 //        } else {
+//            if (!v.wasUsed) {
+//                ret = ret + [.T]
+//            }
 //            if v.isInputVariable && !v.wasModified {
 //                ret = ret + [.P]
-//                if !v.wasUsed {
-//                    ret = ret + [.T]
-//                }
 //            } else {
-//                if v.wasUsed {
-//                    ret = ret + [.M]
-//                } else {
-//                    ret = ret + [.T]
-//                }
+//                ret = ret + [.M]
 //            }
 //        }
 //        return ret
 //    }
+    
+    // No M and T intersection
+    private func getMetricsGroup(of v: ScalaVariable) -> [Metric_Group] {
+        var ret: [Metric_Group] = []
+        if v.isControlVariable {
+            ret = ret + [.C]
+        } else {
+            if v.isInputVariable && !v.wasModified {
+                ret = ret + [.P]
+                if !v.wasUsed {
+                    ret = ret + [.T]
+                }
+            } else {
+                if v.wasUsed {
+                    ret = ret + [.M]
+                } else {
+                    ret = ret + [.T]
+                }
+            }
+        }
+        return ret
+    }
     
     private func updateMetrics(of block: inout CodeBlock){
         block.variables.forEach { (v) in
@@ -501,6 +534,7 @@ class CodeAnalyzer {
         var buffStr: String = block.code
         
         buffStr = buffStr.replacingOccurrences(of: "while", with: "if")
+        buffStr = buffStr.replacingOccurrences(of: "for", with: "if")
         buffStr = buffStr.replacingOccurrences(of: variableInitializationPattern, with: "", options: .regularExpression)
         normalizeCode(of: &buffStr)
         
@@ -607,6 +641,131 @@ class CodeAnalyzer {
         block.defBlocks.keys.forEach { (blockKey) in
             outputMetricsRecursion(of: &(block.defBlocks[blockKey])!)
         }
+    }
+    
+    private func findEntryBlock(in block: inout CodeBlock, result: inout CodeBlock){
+        if block.title.contains("def main") {
+            result = block
+        }
+        block.defBlocks.keys.forEach { (blockKey) in
+            findEntryBlock(in: &(block.defBlocks[blockKey])!, result: &result)
+        }
+    }
+    
+    func getSpenOutputStr() -> String {
+        var ret: String = ""
+        var block: CodeBlock = CodeBlock()
+        findEntryBlock(in: &objectBlock, result: &block)
+        var sumSpen: Int = 0
+        block.variables.forEach { (v) in
+            ret = ret + v.name + "\u{00a0}=\u{00a0}" + String(v.spen) + ", "
+            sumSpen = sumSpen + v.spen
+        }
+        if !ret.isEmpty {
+            ret.removeLast(2)
+        }
+        ret = ret + "\nОбщий спен = " + String(sumSpen)
+        return ret
+    }
+    
+    func getChepinFullStr() -> String {
+        var ret: String = ""
+        var tStr: String = ""
+        let padValue: Int = 7
+        var block: CodeBlock = CodeBlock()
+        var added: Bool = false
+        findEntryBlock(in: &objectBlock, result: &block)
+        tStr = "P(\(block.STDMetrics.P.count)):".padding(toLength: padValue, withPad: " ", startingAt: 0)
+        ret = ret + "\n" + tStr
+        block.STDMetrics.P.forEach { (s) in
+            added = true
+            ret = ret + s + ", "
+        }
+        if added {
+            ret.removeLast(2)
+        }
+        added = false
+        tStr = "M(\(block.STDMetrics.M.count)):".padding(toLength: padValue, withPad: " ", startingAt: 0)
+        ret = ret + "\n" + tStr
+        block.STDMetrics.M.forEach { (s) in
+            added = true
+            ret = ret + s + ", "
+        }
+        if added {
+            ret.removeLast(2)
+        }
+        added = false
+        tStr = "C(\(block.STDMetrics.C.count)):".padding(toLength: padValue, withPad: " ", startingAt: 0)
+        ret = ret + "\n" + tStr
+        block.STDMetrics.C.forEach { (s) in
+            added = true
+            ret = ret + s + ", "
+        }
+        if added {
+            ret.removeLast(2)
+        }
+        added = false
+        tStr = "T(\(block.STDMetrics.T.count)):".padding(toLength: padValue, withPad: " ", startingAt: 0)
+        ret = ret + "\n" + tStr
+        block.STDMetrics.T.forEach { (s) in
+            added = true
+            ret = ret + s + ", "
+        }
+        if added {
+            ret.removeLast(2)
+        }
+        ret = ret + "\n"+"Q:".padding(toLength: padValue, withPad: " ", startingAt: 0) + block.STDMetrics.getQStr()
+        return ret
+    }
+    
+    func getChepinIOStr() -> String {
+        var ret: String = ""
+        var tStr: String = ""
+        let padValue: Int = 7
+        var block: CodeBlock = CodeBlock()
+        var added: Bool = false
+        findEntryBlock(in: &objectBlock, result: &block)
+        tStr = "P(\(block.IOMetrics.P.count)):".padding(toLength: padValue, withPad: " ", startingAt: 0)
+        ret = ret + "\n" + tStr
+        block.IOMetrics.P.forEach { (s) in
+            added = true
+            ret = ret + s + ", "
+        }
+        if added {
+            ret.removeLast(2)
+        }
+        added = false
+        tStr = "M(\(block.IOMetrics.M.count)):".padding(toLength: padValue, withPad: " ", startingAt: 0)
+        ret = ret + "\n" + tStr
+        block.IOMetrics.M.forEach { (s) in
+            added = true
+            ret = ret + s + ", "
+        }
+        if added {
+            ret.removeLast(2)
+        }
+        added = false
+        tStr = "C(\(block.IOMetrics.C.count)):".padding(toLength: padValue, withPad: " ", startingAt: 0)
+        ret = ret + "\n" + tStr
+        block.IOMetrics.C.forEach { (s) in
+            added = true
+            ret = ret + s + ", "
+        }
+        if added {
+            ret.removeLast(2)
+        }
+        added = false
+        tStr = "T(\(block.IOMetrics.T.count)):".padding(toLength: padValue, withPad: " ", startingAt: 0)
+        ret = ret + "\n" + tStr
+        block.IOMetrics.T.forEach { (s) in
+            added = true
+            ret = ret + s + ", "
+        }
+        if added {
+            ret.removeLast(2)
+        }
+        ret = ret + "\n"+"Q:".padding(toLength: padValue, withPad: " ", startingAt: 0) + block.IOMetrics.getQStr()
+        return ret
     }
     
     func outputMetrics(){

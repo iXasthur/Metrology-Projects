@@ -21,7 +21,80 @@ object sort {
     
     // Entry point
     def main(args: Array[String]) {
+    
+        var a:Int = 3
+        var b:Int = 4
+        var c:Float = 0
+        var s:String
+        var square:Float
+        var junk1:String = "My cop"
+        var kobrin:Int = a
+        var europe:String = Console.readStr()
+
+        var junk2:String = "Who Built The Moon? by Noel Gallagher"
+        var minsk:Int = a
+        var america:String
         
+        val lukashenko: Bool = Console.read()
+        
+        var statement1:String = "I want"
+        var statement2 = "to be a multiplexor"
+
+        s = statement1 + statement2
+
+        if (statement != "nickolas allbrook") {
+            Console.println(c)
+        }
+
+        a = b+c
+
+        if (a>s.toInt){
+            b = 35 + sqrt(36) + cluev
+            kobrin = dimaShoroh + abs((c >> 5) + b*25)
+        }
+
+        if (europe == america){
+            c=sqrt(a*a+b*b)
+            square=(a*b)/2
+            minsk = misha + variableThatDoesntExist
+        }
+
+        var i:Int = 0
+        var j:Int = 5
+        while (i<10){
+            Console.printLn("Sha-Lang")
+            Console.printLn("American Dream")
+            i = i + 1
+            Console.println("The value of j is:");
+            // Here, the for loop starts from 0
+            // and ends at 10
+            if (j < 10)
+            {
+                Console.println(j)
+            }
+        }
+
+        var junk3:String = "pizza with pineapples"
+        var junk4:String
+        junk4 = Console.readStr()
+        var bliss:Int
+        var patience:Boolean
+
+        var theSlowRush:String = "the best album ever created by humanity"
+        if ( released(theSlowRush) ){
+
+            bliss = 1000000
+            isOnAlbum( patience )
+            if ( patence = true ){
+                bliss = bliss+10000
+            }
+        }
+
+        var junk5:String = "Marvel Contest of Champions"
+        
+        
+        
+        /*
         var zzz = 1
         var i = Console.readInt().negative()
         var x = 1
@@ -44,7 +117,6 @@ object sort {
             
         }
         Console.println(out,swag(a,b,pow(c,d)))
-        /*
         i match {
             case 1 => {
                 Console.println("Winter")
@@ -82,7 +154,6 @@ object sort {
             }
         }
         */
-
     }
 
 }
