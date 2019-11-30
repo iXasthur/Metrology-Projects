@@ -20,7 +20,7 @@ object sort {
     }
     
     // Entry point
-    def main(args: Array[String]) {
+    def main() {
     
         var a:Int = 3
         var b:Int = 4
@@ -35,7 +35,7 @@ object sort {
         var minsk:Int = a
         var america:String
         
-        val lukashenko: Bool = Console.read()
+        val timoshenko: Bool = 123
         
         var statement1:String = "I want"
         var statement2 = "to be a multiplexor"
@@ -75,7 +75,7 @@ object sort {
         }
 
         var junk3:String = "pizza with pineapples"
-        var junk4:String
+        var junk4:String = ""
         junk4 = Console.readStr()
         var bliss:Int
         var patience:Boolean
